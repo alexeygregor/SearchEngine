@@ -1,7 +1,6 @@
+#pragma once
 
-#ifndef SEARCHSERVER_H
-#define SEARCHSERVER_H
-
+#include "ConverterJSON.h"
 #include "InvertedIndex.h"
 
 struct RelativeIndex
@@ -9,9 +8,9 @@ struct RelativeIndex
     size_t doc_id;
     float rank;
 
-    bool operator ==(const RelativeIndex& other) const
+    bool operator ==( const RelativeIndex& other ) const
     {
-        return (doc_id == other.doc_id && rank == other.rank);
+        return ( doc_id == other.doc_id && rank == other.rank );
     }
 };
 
@@ -19,22 +18,18 @@ class SearchServer
 {
 public:
 
-    SearchServer(InvertedIndex& idx, ConverterJSON& cvr);
+    SearchServer( InvertedIndex& idx );
 
-    vector<vector<RelativeIndex>> search(vector<string> queries_input);
+    vector<vector<RelativeIndex>> search( vector<string> queries_input );
 
-    void searchDocument(vector<string> input_words);
+    void searchDocument( vector<string> input_words );
 
-    void searchDocuments(vector<vector<size_t>> document);
+    void searchDocuments( vector<vector<size_t>> document );
 
-    vector<vector<pair<int, float>>> getAnswers();
+    vector<vector<pair<int, float>>> getAnswers( ConverterJSON& cvr );
 
 private:
     InvertedIndex _index;
-    ConverterJSON _convert;
     vector<vector<RelativeIndex>> relative_index;
     vector<vector<pair<int, float>>> answers;
 };
-
-
-#endif //SEARCHSERVER_H

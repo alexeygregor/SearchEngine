@@ -1,8 +1,4 @@
-
-#ifndef CONVERTERJSON_H
-#define CONVERTERJSON_H
-
-//#define TESTING
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -21,21 +17,27 @@ public:
 
     void starting();
 
-    void loadConfig();
+    void setConfig();
+
+    void setRequest();
+
+    void setDocuments();
+
+    void setResponsesLimit();
 
     void checkConfig();
 
-    void loadRequest();
+    vector<string> getDocuments();
 
     vector<string> getRequests();
 
-    vector<string> getTextDocument();
+    vector<string> getTextPath();
 
     int getResponsesLimit();
 
     bool getDBUpdate();
 
-    void putAnswers(vector<vector<pair<int, float>>> answers);
+    void putAnswers( vector<vector<pair<int, float>>> answers );
 
     void getAnswers();
 
@@ -43,9 +45,8 @@ private:
     json dict;
     float rank = 0;
     size_t doc_id = 0;
-    vector<string> documents;
+    int max_responses = 5;
     vector<string> requests;
+    vector<string> documents;
+    vector<string> input_docs;
 };
-
-
-#endif //CONVERTERJSON_H
