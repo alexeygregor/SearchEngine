@@ -22,9 +22,9 @@ public:
 
     char letterCase( char value );
 
-    vector<Entry> getWordCount( const string& word );
+    void readDocument( ConverterJSON& cvr );
 
-    void getDocuments( ConverterJSON& cvr );
+    vector<Entry> getWordCount( const string& word );
 
 private:
     int thread_count = 0;

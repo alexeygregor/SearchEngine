@@ -25,7 +25,7 @@ TEST( TestCaseInvertedIndex, TestBasic )
             "london is the capital of great britain",
             "big ben is the nickname for the Great bell of the striking clock"
     };
-    const vector<string> requests = {"london", "the"};
+    const vector<string> requests = { "london", "the" };
     const vector<vector<Entry>> expected = {
             {
                     { 0, 1 }
@@ -82,7 +82,7 @@ TEST( TestCaseSearchServer, TestSimple )
             "milk milk milk milk milk water water water water water",
             "americano cappuccino"
     };
-    const vector<string> request = {"milk water", "sugar"};
+    const vector<string> request = { "milk water", "sugar" };
     const vector<vector<RelativeIndex>> expected = {
             {
                     { 2, 1 },
@@ -125,7 +125,7 @@ TEST( TestCaseSearchServer, TestTop5 )
             "tallinn is the capital of estonia",
             "warsaw is the capital of poland",
     };
-    const vector<string> request = {"moscow is the capital of russia"};
+    const vector<string> request = { "moscow is the capital of russia" };
     const vector<vector<RelativeIndex>> expected = {
             {
                     { 7, 1 },

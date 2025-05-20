@@ -1,12 +1,16 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
-#include <string>
+//#define TESTING
+
 #include <fstream>
+#include <iostream>
+#include <locale>
 #include <map>
 #include <mutex>
+#include <string>
 #include <thread>
+#include <vector>
+
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;
 using namespace std;
@@ -15,23 +19,21 @@ class ConverterJSON
 {
 public:
 
-    void starting();
+    void start();
+
+    void finish();
 
     void setConfig();
 
     void setRequest();
 
-    void setDocuments();
-
     void setResponsesLimit();
 
     void checkConfig();
 
-    vector<string> getDocuments();
-
     vector<string> getRequests();
 
-    vector<string> getTextPath();
+    vector<string> getDocPath();
 
     int getResponsesLimit();
 
@@ -48,5 +50,4 @@ private:
     int max_responses = 5;
     vector<string> requests;
     vector<string> documents;
-    vector<string> input_docs;
 };

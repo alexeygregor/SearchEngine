@@ -17,10 +17,10 @@ vector<vector<RelativeIndex>> SearchServer::search( vector<string> queries_input
 
         while ( simbol < request.length() )
         {
-            if ( request[simbol] != ' ' ) word += request[simbol];
+            if ( request[ simbol ] != ' ' ) word += request[ simbol ];
             if ( !word.empty() )
             {
-                if ( request[simbol] == ' ' || simbol == request.length() - 1 )
+                if ( request[ simbol ] == ' ' || simbol == request.length() - 1 )
                 {
                     input_words.push_back( word );
                     word.clear();
@@ -41,7 +41,7 @@ void SearchServer::searchDocument( vector<string> input_words )
     for ( size_t i = 0; i < input_words.size(); ++i )
     {
         size_t count = 0;
-        entry = _index.getWordCount( input_words[i] );
+        entry = _index.getWordCount( input_words[ i ] );
 
         for ( auto& j : entry )
             count += j.count;
@@ -51,7 +51,7 @@ void SearchServer::searchDocument( vector<string> input_words )
 
     for ( auto& i : infrequent )
     {
-        entry = _index.getWordCount( input_words[i[1]] );
+        entry = _index.getWordCount( input_words[ i[ 1 ] ] );
         for ( auto& j : entry )
         {
             bool check = true;
@@ -64,9 +64,9 @@ void SearchServer::searchDocument( vector<string> input_words )
             {
                 for ( auto& k : document )
                 {
-                    if ( k[1] == j.doc_id )
+                    if ( k[ 1 ] == j.doc_id )
                     {
-                        k[0] += j.count;
+                        k[ 0 ] += j.count;
                         check = false;
                         break;
                     }
@@ -93,24 +93,24 @@ void SearchServer::searchDocuments( vector<vector<size_t>> document )
             check = false;
             for ( auto i = 0; i < document.size() - 1; ++i )
             {
-                if ( document[i][0] < document[i + 1][0] )
+                if ( document[ i ][ 0 ] < document[ i + 1 ][ 0 ] )
                 {
-                    swap( document[i], document[i + 1] );
+                    swap( document[ i ], document[ i + 1 ] );
                     check = true;
                 }
             }
         }
-        max = document[0][0];
+        max = document[ 0 ][ 0 ];
     }
 
     ConverterJSON cvr;
     for ( auto & i : document )
     {
         if ( input_relative.size() == cvr.getResponsesLimit() ) break;
-        rank = ( float )i[0] / ( float )max;
-        rlv.doc_id = i[1];
+        rank = ( float ) i[ 0 ] / ( float )max;
+        rlv.doc_id = i[ 1 ];
         rlv.rank = rank;
-        input_relative.push_back( { i[1], rank } );
+        input_relative.push_back( { i[ 1 ], rank } );
     }
     relative_index.push_back( input_relative );
 }

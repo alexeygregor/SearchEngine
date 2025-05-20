@@ -16,13 +16,12 @@ int main()
     catch ( const invalid_argument& e )
     {
         cerr << e.what() << endl;
-        return 0;
+        return -1;
     }
 
-    cvr.starting();
-    cvr.setDocuments();
+    cvr.start();
     cvr.setResponsesLimit();
-    idx.updateDocumentBase( cvr.getDocuments() );
+    idx.updateDocumentBase( cvr.getDocPath() );
 
     while ( true )
     {
@@ -36,14 +35,17 @@ int main()
             SearchServer srv( idx );
             cvr.putAnswers( srv.getAnswers( cvr ) );
             cvr.getAnswers();
-            if ( cvr.getDBUpdate() ) idx.updateDocumentBase( cvr.getDocuments() );
+            if ( cvr.getDBUpdate() ) idx.updateDocumentBase( cvr.getDocPath() );
         }
         else if ( command == "read" )
         {
-            idx.getDocuments( cvr );
+            idx.readDocument( cvr );
         }
         else if ( command == "quit" )
+        {
+            cvr.finish();
             break;
+        }
         else
             cerr << "Incorrect command" << endl;
     }
