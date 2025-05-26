@@ -56,6 +56,7 @@ void ConverterJSON::setDocuments()
     ifstream File( "config.json" );
     File >> dict;
     File.close();
+    documents.clear();
     for ( auto& i : dict[ "files" ] )
         documents.push_back( i );
 }
