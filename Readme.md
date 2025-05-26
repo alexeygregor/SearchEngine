@@ -48,8 +48,3 @@
 #### int main (): ####
 
 *	setConfig () - загрузка config.json по умолчанию.
-
-
-#### ConverterJSON.h: ####
-
-*	define TESTING - подключается на время тестирования.
