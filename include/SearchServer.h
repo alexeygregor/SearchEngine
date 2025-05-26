@@ -18,6 +18,8 @@ class SearchServer
 {
 public:
 
+    SearchServer() = default;
+
     SearchServer( InvertedIndex& idx );
 
     vector<vector<RelativeIndex>> search( vector<string> queries_input );

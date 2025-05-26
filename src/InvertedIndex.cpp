@@ -4,9 +4,11 @@
 
 mutex dict_access;
 
+InvertedIndex::InvertedIndex( ConverterJSON& cvr ) : _convert( cvr ) {};
+
 void InvertedIndex::indexDocument( const size_t& doc_id, vector<string> texts_input )
 {
-    while ( !texts_input.empty() )
+    while ( ! texts_input.empty() )
     {
         size_t count = 0;
         vector<Entry> entry;
@@ -49,60 +51,62 @@ void InvertedIndex::updateDocumentBase( vector<string> input_docs )
         string word;
         vector<string> texts_input;
 
-        #ifdef TESTING
-        int simbol = 0;
-        while(simbol < doc_page.length())
+        if( ! _convert.getDocuments().empty() )
         {
-            if ( doc_page[ simbol ] != ' ' ) word += doc_page[ simbol ];
-            if( !word.empty() )
+            ifstream Check( doc_page.c_str(), ios::in );
+            Check >> word;
+            if( word.empty() )
+                cerr << "file_" << to_string( doc_id ) << " not found" << endl;
+            Check.close();
+
+            ifstream Document( doc_page.c_str(), ios::in );
+            while ( Document >> word )
             {
-                if( doc_page[ simbol ] == ' ' || simbol == doc_page.length() - 1 )
+                string buffer;
+                for ( auto i = 0; i < word.size(); ++i )
                 {
-                    texts_input.push_back( word );
-                    word.clear();
+                    word[ i ] = letterCase( word[ i ] );
+
+                    if ( word[ i ] == '.' || word[ i ] == ',' || word[ i ] == '!' || word[ i ] == '?'
+                      || word[ i ] == '-' || word[ i ] == '"' || word[ i ] == ':' || word[ i ] == ';'
+                      || word[ i ] == '(' || word[ i ] == ')' || ( word[ i ] == '\'' && word[ i + 1 ] == 's' ) )
+                    {
+                        if ( word[ i ] == '\'' ) ++i;
+                        if ( ! buffer.empty() ) texts_input.push_back( buffer );
+                        buffer.clear();
+                    }
+                    else  buffer += word[ i ];
+                }
+                if ( ! buffer.empty() ) texts_input.push_back( buffer );
+
+                if ( texts_input.size() > 1000 || buffer.length() > 10 )
+                {
+                    cerr << "file_" << to_string( doc_id );
+                    if ( buffer.length() > 10 ) cerr << ": " << buffer << " \n";
+                    else cerr << ": lots of words" << " \n";
+                    texts_input.clear();
+                    break;
                 }
             }
-            ++simbol;
+            Document.close();
         }
-        #endif
-
-        #ifndef TESTING
-        ifstream Check( doc_page.c_str(), ios::in );
-        Check >> word;
-        if( word.empty() )
-            cerr << "file_" << to_string( doc_id ) << " not found" << endl;
-        Check.close();
-
-        ifstream Document( doc_page.c_str(), ios::in );
-        while ( Document >> word )
+        else
         {
-            string buffer;
-            for ( auto i = 0; i < word.size(); ++i )
+            int simbol = 0;
+            while( simbol < doc_page.length() )
             {
-                word[ i ] = letterCase( word[ i ] );
-                if ( word[ i ] == '.' || word[ i ] == ',' || word[ i ] == '!'
-                  || word[ i ] == '-' || word[ i ] == '"' ||
-                  ( word[ i ] == '\'' && word[ i + 1 ] == 's' ) )
+                if ( doc_page[ simbol ] != ' ' ) word += doc_page[ simbol ];
+                if( ! word.empty() )
                 {
-                    if ( word[ i ] == '\'' ) ++i;
-                    if ( !buffer.empty() ) texts_input.push_back( buffer );
-                    buffer.clear();
+                    if( doc_page[ simbol ] == ' ' || simbol == doc_page.length() - 1 )
+                    {
+                        texts_input.push_back( word );
+                        word.clear();
+                    }
                 }
-                else  buffer += word[ i ];
-            }
-            if ( !buffer.empty() ) texts_input.push_back( buffer );
-
-            if ( texts_input.size() > 1000 || buffer.length() > 10 )
-            {
-                cerr << "file_" << to_string( doc_id );
-                if ( buffer.length() > 10 ) cerr << ": " << buffer << " \n";
-                else cerr << ": lots of words" << " \n";
-                texts_input.clear();
-                break;
+                ++simbol;
             }
         }
-        Document.close();
-        #endif
 
         indexDocument( doc_id, texts_input );
     };
@@ -117,7 +121,7 @@ void InvertedIndex::updateDocumentBase( vector<string> input_docs )
         }
         else check = false;
     }
-    if ( !check ) cerr << "1000+ files" << endl;
+    if ( ! check ) cerr << "1000+ files" << endl;
 
     while ( thread_count < input_docs.size() );
 }
@@ -137,40 +141,31 @@ char InvertedIndex::letterCase( char value )
     return value;
 };
 
-void InvertedIndex::readDocument( ConverterJSON& cvr )
+void InvertedIndex::readDocument()
 {
-    int doc_id = 0;
     string request, textline;
 
-    cout << "Input file number:" << endl;
+    cout << "Input file doc_id:" << endl;
     getline( cin, request );
 
-    for ( auto i = 0; i < request.length(); ++i )
-    {
-        if ( ( int )request[ i ] - 48 < 0 || ( int )request[ i ] - 48 > 9)
-        {
-            doc_id = 0;
-            break;
-        }
-        if ( i > 0 ) doc_id *= 10;
-        doc_id += ( int )request[ i ] - 48;
-    }
+    int doc_id = stoi( request );
 
-    if ( doc_id <= 0 && doc_id > cvr.getDocPath().size() )
+    if ( doc_id < 0 && doc_id >= _convert.getDocuments().size() )
         cerr << "File not found" << endl;
     else
     {
-        ifstream Check( cvr.getDocPath()[ doc_id - 1 ].c_str(), ios::in );
+        ifstream Check( _convert.getDocuments()[ doc_id ].c_str(), ios::in );
         Check >> textline;
         if ( textline.empty() )
             cerr << "File not found" << endl;
         else
         {
-            ifstream Document( cvr.getDocPath()[ doc_id - 1 ].c_str(), ios::in );
+            ifstream Document
+            ( _convert.getDocuments()[ doc_id ].c_str(), ios::in );
+
             while ( getline( Document, textline, '\n' ) )
-            {
                 cout << textline << endl;
-            }
+
             Document.close();
         }
     }

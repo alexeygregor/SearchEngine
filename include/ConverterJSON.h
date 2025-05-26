@@ -1,10 +1,7 @@
 #pragma once
 
-//#define TESTING
-
 #include <fstream>
 #include <iostream>
-#include <locale>
 #include <map>
 #include <mutex>
 #include <string>
@@ -19,29 +16,31 @@ class ConverterJSON
 {
 public:
 
+    ConverterJSON() = default;
+
     void start();
 
     void finish();
 
     void setConfig();
 
-    void setRequest();
+    void checkConfig();
 
     void setResponsesLimit();
 
-    void checkConfig();
+    void setDocuments();
+
+    vector<string> getDocuments();
+
+    void setRequest();
 
     vector<string> getRequests();
-
-    vector<string> getDocPath();
 
     int getResponsesLimit();
 
     bool getDBUpdate();
 
     void putAnswers( vector<vector<pair<int, float>>> answers );
-
-    void getAnswers();
 
 private:
     json dict;

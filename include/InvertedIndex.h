@@ -15,6 +15,9 @@ struct Entry
 class InvertedIndex
 {
 public:
+    InvertedIndex() = default;
+
+    InvertedIndex(ConverterJSON& cvr);
 
     void indexDocument( const size_t& doc_id, vector<string> texts_input );
 
@@ -22,11 +25,12 @@ public:
 
     char letterCase( char value );
 
-    void readDocument( ConverterJSON& cvr );
+    void readDocument();
 
     vector<Entry> getWordCount( const string& word );
 
 private:
+    ConverterJSON _convert;
     int thread_count = 0;
     map<string, vector<Entry>>::iterator it;
     map<string, vector<Entry>> freq_dictionary;

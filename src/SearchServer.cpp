@@ -18,7 +18,7 @@ vector<vector<RelativeIndex>> SearchServer::search( vector<string> queries_input
         while ( simbol < request.length() )
         {
             if ( request[ simbol ] != ' ' ) word += request[ simbol ];
-            if ( !word.empty() )
+            if ( ! word.empty() )
             {
                 if ( request[ simbol ] == ' ' || simbol == request.length() - 1 )
                 {
@@ -85,7 +85,7 @@ void SearchServer::searchDocuments( vector<vector<size_t>> document )
     RelativeIndex rlv;
     vector<RelativeIndex> input_relative;
 
-    if( !document.empty() )
+    if( ! document.empty() )
     {
         bool check = true;
         while ( check )
@@ -117,9 +117,10 @@ void SearchServer::searchDocuments( vector<vector<size_t>> document )
 
 vector<vector<pair<int, float>>> SearchServer::getAnswers( ConverterJSON& cvr )
 {
+    answers.clear();
     for ( auto& i : search( cvr.getRequests() ) )
     {
-        vector<pair<int, float>>answer;
+        vector<pair<int, float>> answer;
         for ( auto& j : i )
             answer.push_back( { j.doc_id, j.rank } );
         answers.push_back( answer );

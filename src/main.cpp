@@ -6,7 +6,6 @@
 int main()
 {
     ConverterJSON cvr;
-    InvertedIndex idx;
     cvr.setConfig();
 
     try
@@ -20,13 +19,16 @@ int main()
     }
 
     cvr.start();
+    cvr.setDocuments();
     cvr.setResponsesLimit();
-    idx.updateDocumentBase( cvr.getDocPath() );
+
+    InvertedIndex idx( cvr );
+    idx.updateDocumentBase( cvr.getDocuments() );
 
     while ( true )
     {
         string command;
-        cout << "Input command:" << endl;
+        cout << "\nInput command:" << endl;
         getline( cin, command );
 
         if ( command == "find" )
@@ -34,12 +36,15 @@ int main()
             cvr.setRequest();
             SearchServer srv( idx );
             cvr.putAnswers( srv.getAnswers( cvr ) );
-            cvr.getAnswers();
-            if ( cvr.getDBUpdate() ) idx.updateDocumentBase( cvr.getDocPath() );
+            if ( cvr.getDBUpdate() )
+            {
+                cvr.setDocuments();
+                idx.updateDocumentBase( cvr.getDocuments() );
+            }
         }
         else if ( command == "read" )
         {
-            idx.readDocument( cvr );
+            idx.readDocument();
         }
         else if ( command == "quit" )
         {
