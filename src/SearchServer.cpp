@@ -28,7 +28,13 @@ vector<vector<RelativeIndex>> SearchServer::search( vector<string> queries_input
             }
             ++simbol;
         }
-        searchDocument( input_words );
+        if ( input_words.size() > 10 )
+        {
+            input_words.clear();
+            cerr << "Overlong request" << endl;
+        }
+        else
+            searchDocument( input_words );
     }
     return relative_index;
 }
