@@ -25,6 +25,8 @@ public:
 
     char letterCase( char& value );
 
+    void suffixS ( vector<string>& texts_input);
+
     void readDocument();
 
     vector<Entry> getWordCount( const string& word );

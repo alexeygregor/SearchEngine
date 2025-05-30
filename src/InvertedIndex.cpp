@@ -108,6 +108,7 @@ void InvertedIndex::updateDocumentBase( vector<string> input_docs )
             }
         }
 
+        suffixS( texts_input );
         indexDocument( doc_id, texts_input );
     };
 
@@ -140,6 +141,30 @@ char InvertedIndex::letterCase( char& value )
     }
     return value;
 };
+
+void InvertedIndex::suffixS ( vector<string>& texts_input)
+{
+    for( auto & i : texts_input )
+    {
+        if ( i.size() <= 3 ) continue;
+
+        if ( i[ i.size() - 1 ] == 's')
+        {
+            int spos = 0, pos3 = i.size() - 3;
+            string ies( "ies" ), suffixes ( "oussisius" );
+
+            if ( ! i.compare( pos3, 3, ies ) )
+                i.replace( pos3, 3, 1, 'y' );
+            else if ( ! i.compare( pos3, 3, suffixes, spos, 3 ) ||
+                  ! i.compare( pos3, 3, suffixes, spos + 2, 2 ) ||
+                  ! i.compare( pos3, 3, suffixes, spos + 4, 2 ) ||
+                  ! i.compare( pos3, 3, suffixes, spos + 6, 3 ) )
+                continue;
+            else
+                i.erase( pos3 + 2 );
+        }
+    }
+}
 
 void InvertedIndex::readDocument()
 {
