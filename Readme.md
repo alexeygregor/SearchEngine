@@ -45,13 +45,7 @@
 	 
 
 #### requests.json: ####
- {
-	 "requests": [
-	 "some words..",
-	 "some words..",
-	 …
-	 ]
- }
+*	{ "requests": [ "some words..", "some words..", … ] }
 	 
 #### int main (): ####
 
