@@ -40,7 +40,7 @@ public:
 
     bool getDBUpdate();
 
-    void putAnswers( vector<vector<pair<int, float>>> answers );
+    void putAnswers( const vector<vector<pair<int, float>>>& answers );
 
 private:
     json dict;

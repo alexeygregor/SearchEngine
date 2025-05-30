@@ -19,11 +19,11 @@ public:
 
     InvertedIndex(ConverterJSON& cvr);
 
-    void indexDocument( const size_t& doc_id, vector<string> texts_input );
+    void indexDocument( const size_t& doc_id, vector<string>& texts_input );
 
     void updateDocumentBase( vector<string> input_docs );
 
-    char letterCase( char value );
+    char letterCase( char& value );
 
     void readDocument();
 

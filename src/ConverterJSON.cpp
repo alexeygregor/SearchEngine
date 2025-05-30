@@ -120,7 +120,7 @@ bool ConverterJSON::getDBUpdate()
     return true;
 }
 
-void ConverterJSON::putAnswers( vector<vector<pair<int, float>>> answers )
+void ConverterJSON::putAnswers( const vector<vector<pair<int, float>>>& answers )
 {
     if ( ! requests.empty() )
     {

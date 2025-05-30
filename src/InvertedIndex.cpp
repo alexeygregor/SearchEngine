@@ -6,7 +6,7 @@ mutex dict_access;
 
 InvertedIndex::InvertedIndex( ConverterJSON& cvr ) : _convert( cvr ) {};
 
-void InvertedIndex::indexDocument( const size_t& doc_id, vector<string> texts_input )
+void InvertedIndex::indexDocument( const size_t& doc_id, vector<string>& texts_input )
 {
     while ( ! texts_input.empty() )
     {
@@ -65,7 +65,7 @@ void InvertedIndex::updateDocumentBase( vector<string> input_docs )
                 string buffer;
                 for ( auto i = 0; i < word.size(); ++i )
                 {
-                    word[ i ] = letterCase( word[ i ] );
+                    letterCase( word[ i ] );
 
                     if ( word[ i ] == '.' || word[ i ] == ',' || word[ i ] == '!' || word[ i ] == '?'
                       || word[ i ] == '-' || word[ i ] == '"' || word[ i ] == ':' || word[ i ] == ';'
@@ -126,7 +126,7 @@ void InvertedIndex::updateDocumentBase( vector<string> input_docs )
     while ( thread_count < input_docs.size() );
 }
 
-char InvertedIndex::letterCase( char value )
+char InvertedIndex::letterCase( char& value )
 {
     string caps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 

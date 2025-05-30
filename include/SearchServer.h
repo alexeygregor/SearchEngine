@@ -24,11 +24,11 @@ public:
 
     vector<vector<RelativeIndex>> search( vector<string> queries_input );
 
-    void searchDocument( vector<string> input_words );
+    void searchDocument( vector<string>& input_words );
 
-    void searchDocuments( vector<vector<size_t>> document );
+    void searchDocuments( vector<vector<size_t>>& document );
 
-    vector<vector<pair<int, float>>> getAnswers( ConverterJSON& cvr );
+    const vector<vector<pair<int, float>>>& getAnswers( ConverterJSON& cvr );
 
 private:
     InvertedIndex _index;

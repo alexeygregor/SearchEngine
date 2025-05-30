@@ -39,7 +39,7 @@ vector<vector<RelativeIndex>> SearchServer::search( vector<string> queries_input
     return relative_index;
 }
 
-void SearchServer::searchDocument( vector<string> input_words )
+void SearchServer::searchDocument( vector<string>& input_words )
 {
     vector<Entry> entry;
     vector<vector<size_t>> infrequent, document;
@@ -84,7 +84,7 @@ void SearchServer::searchDocument( vector<string> input_words )
     searchDocuments( document );
 }
 
-void SearchServer::searchDocuments( vector<vector<size_t>> document )
+void SearchServer::searchDocuments( vector<vector<size_t>>& document )
 {
     int max = 0;
     float rank = 0;
@@ -121,7 +121,7 @@ void SearchServer::searchDocuments( vector<vector<size_t>> document )
     relative_index.push_back( input_relative );
 }
 
-vector<vector<pair<int, float>>> SearchServer::getAnswers( ConverterJSON& cvr )
+const vector<vector<pair<int, float>>>& SearchServer::getAnswers( ConverterJSON& cvr )
 {
     answers.clear();
     for ( auto& i : search( cvr.getRequests() ) )
