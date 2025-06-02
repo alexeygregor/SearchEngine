@@ -26,7 +26,7 @@
 *   read — прочитать файл. 
 *   quit — выход из программы. 
 
-#### int main () : ####
+#### main.cpp : ####
 *  setConfigJSON () — загрузка config.json по умолчанию
 
 
