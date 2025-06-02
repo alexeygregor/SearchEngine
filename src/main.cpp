@@ -6,11 +6,11 @@
 int main()
 {
     ConverterJSON cvr;
-    cvr.setConfig();
+    cvr.setConfigJSON();
 
     try
     {
-        cvr.checkConfig();
+        cvr.checkConfigJSON();
     }
     catch ( const invalid_argument& e )
     {
@@ -21,6 +21,7 @@ int main()
     cvr.start();
     cvr.setDocuments();
     cvr.setResponsesLimit();
+    cvr.checkRequestsJSON();
 
     InvertedIndex idx( cvr );
     idx.updateDocumentBase( cvr.getDocuments() );

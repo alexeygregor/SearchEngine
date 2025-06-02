@@ -22,9 +22,13 @@ public:
 
     void finish();
 
-    void setConfig();
+    void setConfigJSON();
 
-    void checkConfig();
+    void checkConfigJSON();
+
+    void setRequestsJSON();
+
+    void checkRequestsJSON();
 
     void setResponsesLimit();
 

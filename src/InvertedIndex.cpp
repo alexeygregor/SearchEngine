@@ -57,7 +57,6 @@ void InvertedIndex::updateDocumentBase( vector<string> input_docs )
             Check >> word;
             if( word.empty() )
                 cerr << "file_" << to_string( doc_id ) << " not found" << endl;
-            Check.close();
 
             ifstream Document( doc_page.c_str(), ios::in );
             while ( Document >> word )
@@ -88,7 +87,6 @@ void InvertedIndex::updateDocumentBase( vector<string> input_docs )
                     break;
                 }
             }
-            Document.close();
         }
         else
         {
@@ -190,8 +188,6 @@ void InvertedIndex::readDocument()
 
             while ( getline( Document, textline, '\n' ) )
                 cout << textline << endl;
-
-            Document.close();
         }
     }
 }

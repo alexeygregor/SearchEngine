@@ -91,7 +91,7 @@ void SearchServer::searchDocuments( vector<vector<size_t>>& document )
     RelativeIndex rlv;
     vector<RelativeIndex> input_relative;
 
-    if( ! document.empty() )
+    if ( ! document.empty() )
     {
         bool check = true;
         while ( check )

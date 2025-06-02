@@ -17,15 +17,15 @@ void ConverterJSON::finish()
     cout << "\nFinishing " << name << endl;
 }
 
-void ConverterJSON::setConfig()
-    {
-        ifstream getConfig( "resourses/config.json" );
-        getConfig >> dict;
-        ofstream putConfig( "config.json" );
-        putConfig << dict;
-    }
+void ConverterJSON::setConfigJSON()
+{
+    ifstream getFile( "resourses/config.json" );
+    getFile >> dict;
+    ofstream putFile( "config.json" );
+    putFile << dict;
+}
 
-void ConverterJSON::checkConfig()
+void ConverterJSON::checkConfigJSON()
 {
     if ( ifstream Check1( "config.json", ios::in ); ! Check1 )
         throw invalid_argument( "config file is empty" );
@@ -44,6 +44,22 @@ void ConverterJSON::checkConfig()
     }
 }
 
+void ConverterJSON::setRequestsJSON()
+{
+    ifstream getFile( "resourses/requests.json" );
+    getFile >> dict;
+    ofstream putFile( "requests.json" );
+    putFile << dict;
+}
+
+void ConverterJSON::checkRequestsJSON()
+{
+    string valid;
+    ifstream Check( "requests.json" );
+    Check >> valid;
+    if ( valid.empty() ) setRequestsJSON();
+}
+
 void ConverterJSON::setResponsesLimit()
 {
     ifstream File( "config.json" );
@@ -55,7 +71,6 @@ void ConverterJSON::setDocuments()
 {
     ifstream File( "config.json" );
     File >> dict;
-    File.close();
     documents.clear();
     for ( auto& i : dict[ "files" ] )
         documents.push_back( i );
@@ -71,13 +86,13 @@ void ConverterJSON::setRequest()
     string valid;
     ifstream Check( "requests.json" );
     Check >> valid;
-    Check.close();
-    if ( ! valid.empty() )
-    {
-        ifstream getFile( "requests.json" );
-        getFile >> dict;
-        getFile.close();
-    }
+    if ( valid.empty() ) setRequestsJSON();
+
+    ifstream getFile( "requests.json" );
+    getFile >> dict;
+
+    if ( dict[ "requests" ].empty() )
+        cerr << "Nothing a search for" << endl;
 
     requests.clear();
     if ( dict[ "requests" ].size() <= 1000 )
@@ -105,14 +120,13 @@ bool ConverterJSON::getDBUpdate()
     Config >> dict;
     int db_update = dict[ "config" ][ "db_update" ];
     dict.clear();
-    Config.close();
     string valid;
     ifstream Check( "requests.json" );
     Check >> valid;
-    Check.close();
     if ( ! valid.empty() )
     {
-        if ( requests.size() % db_update != 0 )
+        if ( requests.size() == 0 ||
+             requests.size() % db_update != 0 )
             return false;
     }
 
@@ -154,7 +168,6 @@ void ConverterJSON::putAnswers( const vector<vector<pair<int, float>>>& answers 
             }
         }
         putFile << dict;
-        putFile.close();
         cout << "complete" << endl;
     }
 }
