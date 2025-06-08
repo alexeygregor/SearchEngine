@@ -50,7 +50,7 @@
 
 Пример описания файла requests.json:
 ```javascript
-  { "requests": [ "some words..", "some words..", … ] }
+  { "requests": [ "some words..", "some words..", "some words..", … ] }
 ```
 
 
