@@ -48,8 +48,6 @@ public:
 
 private:
     json dict;
-    float rank = 0;
-    size_t doc_id = 0;
     int max_responses = 5;
     vector<string> requests;
     vector<string> documents;

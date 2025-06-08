@@ -12,9 +12,9 @@ vector<vector<RelativeIndex>> SearchServer::search( vector<string> queries_input
     for ( auto& request : queries_input )
     {
         string word;
-        int simbol = 0;
         vector<string> input_words;
 
+        int simbol = 0;
         while ( simbol < request.length() )
         {
             if ( request[ simbol ] != ' ' ) word += request[ simbol ];

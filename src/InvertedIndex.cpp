@@ -67,10 +67,10 @@ void InvertedIndex::updateDocumentBase( vector<string> input_docs )
                     letterCase( word[ i ] );
 
                     if ( word[ i ] == '.' || word[ i ] == ',' || word[ i ] == '!' || word[ i ] == '?'
-                      || word[ i ] == '-' || word[ i ] == '"' || word[ i ] == ':' || word[ i ] == ';'
-                      || word[ i ] == '(' || word[ i ] == ')' || ( word[ i ] == '\'' && word[ i + 1 ] == 's' ) )
+                      || word[ i ] == '-' || word[ i ] == ':' || word[ i ] == ';' || word[ i ] == '(' || word[ i ] == ')' 
+					  || word[ i ] == '"' || word[ i ] == '\'' || ( word[ i ] == '\'' && word[ i + 1 ] == 's' ) )
                     {
-                        if ( word[ i ] == '\'' ) ++i;
+                        if ( word[ i ] == '\'' && word[ i + 1 ] == 's' ) ++i;
                         if ( ! buffer.empty() ) texts_input.push_back( buffer );
                         buffer.clear();
                     }
@@ -166,12 +166,12 @@ void InvertedIndex::suffixS ( vector<string>& texts_input)
 
 void InvertedIndex::readDocument()
 {
-    string request, textline;
+    string document, textline;
 
     cout << "Input file doc_id:" << endl;
-    getline( cin, request );
+    getline( cin, document );
 
-    int doc_id = stoi( request );
+    int doc_id = stoi( document );
 
     if ( doc_id < 0 && doc_id >= _convert.getDocuments().size() )
         cerr << "File not found" << endl;

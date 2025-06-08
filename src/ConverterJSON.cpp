@@ -23,18 +23,19 @@ void ConverterJSON::setConfigJSON()
     getFile >> dict;
     ofstream putFile( "config.json" );
     putFile << dict;
+	cout << "Create config.json" << endl;
 }
 
 void ConverterJSON::checkConfigJSON()
 {
     if ( ifstream Check1( "config.json", ios::in ); ! Check1 )
-        throw invalid_argument( "config file is empty" );
+        throw invalid_argument( "Config file is empty" );
     else
     {
         json dict1;
         Check1 >> dict1;
         if ( dict1[ "config" ].empty() )
-            throw invalid_argument( "config file is missing" );
+            throw invalid_argument( "Config file is missing" );
 
         json dict2;
         ifstream Check2( "resourses/config.json" );
@@ -50,6 +51,7 @@ void ConverterJSON::setRequestsJSON()
     getFile >> dict;
     ofstream putFile( "requests.json" );
     putFile << dict;
+	cout << "Create requests.json" << endl;
 }
 
 void ConverterJSON::checkRequestsJSON()
@@ -130,7 +132,7 @@ bool ConverterJSON::getDBUpdate()
             return false;
     }
 
-    cout << "db_update" << endl;
+    cout << "DocumentBase update" << endl;
     return true;
 }
 
@@ -168,6 +170,6 @@ void ConverterJSON::putAnswers( const vector<vector<pair<int, float>>>& answers 
             }
         }
         putFile << dict;
-        cout << "complete" << endl;
+        cout << "Сomplete" << endl;
     }
 }
