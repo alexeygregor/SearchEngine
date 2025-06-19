@@ -1,22 +1,6 @@
 
 #include "ConverterJSON.h"
 
-void ConverterJSON::start()
-{
-    ifstream File( "config.json" );
-    File >> dict;
-    string name = dict[ "config" ][ "name" ];
-    cout << "\nStarting " << name << endl;
-}
-
-void ConverterJSON::finish()
-{
-    ifstream File( "config.json" );
-    File >> dict;
-    string name = dict[ "config" ][ "name" ];
-    cout << "\nFinishing " << name << endl;
-}
-
 void ConverterJSON::setConfigJSON()
 {
     ifstream getFile( "resourses/config.json" );
@@ -170,6 +154,6 @@ void ConverterJSON::putAnswers( const vector<vector<pair<int, float>>>& answers 
             }
         }
         putFile << dict;
-        cout << "Сomplete" << endl;
+        cout << "Search complete" << endl;
     }
 }

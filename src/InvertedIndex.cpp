@@ -164,34 +164,6 @@ void InvertedIndex::suffixS ( vector<string>& texts_input)
     }
 }
 
-void InvertedIndex::readDocument()
-{
-    string document, textline;
-
-    cout << "Input file doc_id:" << endl;
-    getline( cin, document );
-
-    int doc_id = stoi( document );
-
-    if ( doc_id < 0 && doc_id >= _convert.getDocuments().size() )
-        cerr << "File not found" << endl;
-    else
-    {
-        ifstream Check( _convert.getDocuments()[ doc_id ].c_str(), ios::in );
-        Check >> textline;
-        if ( textline.empty() )
-            cerr << "File not found" << endl;
-        else
-        {
-            ifstream Document
-            ( _convert.getDocuments()[ doc_id ].c_str(), ios::in );
-
-            while ( getline( Document, textline, '\n' ) )
-                cout << textline << endl;
-        }
-    }
-}
-
 vector<Entry> InvertedIndex::getWordCount( const string& word )
 {
     vector<Entry> entry;

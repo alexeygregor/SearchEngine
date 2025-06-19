@@ -5,6 +5,7 @@
 
 int main()
 {
+    cout << endl;
     ConverterJSON cvr;
     cvr.setConfigJSON();
 
@@ -18,7 +19,6 @@ int main()
         return -1;
     }
 
-    cvr.start();
     cvr.setDocuments();
     cvr.setResponsesLimit();
     cvr.checkRequestsJSON();
@@ -26,33 +26,15 @@ int main()
     InvertedIndex idx( cvr );
     idx.updateDocumentBase( cvr.getDocuments() );
 
-    while ( true )
-    {
-        string command;
-        cout << "\nInput command:" << endl;
-        getline( cin, command );
+    cvr.setRequest();
+    SearchServer srv( idx );
+    cvr.putAnswers( srv.getAnswers( cvr ) );
 
-        if ( command == "find" )
-        {
-            cvr.setRequest();
-            SearchServer srv( idx );
-            cvr.putAnswers( srv.getAnswers( cvr ) );
-            if ( cvr.getDBUpdate() )
-            {
-                cvr.setDocuments();
-                idx.updateDocumentBase( cvr.getDocuments() );
-            }
-        }
-        else if ( command == "read" )
-        {
-            idx.readDocument();
-        }
-        else if ( command == "quit" )
-        {
-            cvr.finish();
-            break;
-        }
-        else
-            cerr << "Incorrect command" << endl;
+    if ( cvr.getDBUpdate() )
+    {
+        cvr.setDocuments();
+        idx.updateDocumentBase( cvr.getDocuments() );
     }
+
+    //cin.get();
 }

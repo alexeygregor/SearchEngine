@@ -18,10 +18,6 @@ public:
 
     ConverterJSON() = default;
 
-    void start();
-
-    void finish();
-
     void setConfigJSON();
 
     void checkConfigJSON();

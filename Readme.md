@@ -21,14 +21,8 @@
     IDE Clion, MinGW, NlohmannJSON, GoogleTests.
 
 
-#### Терминал : ####
-*	find — выполнить поиск запроса ( -ов ). 
-*	read — прочитать найденный документ. 
-*	quit — выйти из программы. 
-
-
 #### main.cpp : ####
-*	setConfigJSON () — загрузка config.json по умолчанию
+*	setConfigJSON () — загрузка config.json по умолчанию.
 
 
 #### config.json : ####
@@ -48,11 +42,11 @@
 #### requests.json : ####
 *	Один запрос включает от 1 до 10 слов, все слова состоят из строчных латинских букв.
 
+
 Пример описания файла requests.json:
 ```javascript
   { "requests": [ "some words..", "some words..", "some words..", … ] }
 ```
-
 
 #### answers.json : ####
 *	request… — идентификатор запроса, по которому сформирован ответ.

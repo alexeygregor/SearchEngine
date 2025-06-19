@@ -27,8 +27,6 @@ public:
 
     void suffixS ( vector<string>& texts_input);
 
-    void readDocument();
-
     vector<Entry> getWordCount( const string& word );
 
 private:
