@@ -61,19 +61,18 @@
 	"answers": {
 		"request_1": {
 			"relevance": {
-			    "doc_id": [ 0, 1, 2, 3 ], 
-                            "rank": [ 0.989, 0.897, 0.750, 0.670 ],
-			    "result": "true"
+				"doc_id": [ 0, 1, 2, 3 ], 
+				"rank": [ 0.989, 0.897, 0.750, 0.670 ],
+				"result": "true"
 			}
 		},
-
-        "request_2": {
-            "doc_id": [ 1 ], 
-            "rank": [ 1.0 ],
-            "result": "true"
-        },
+	        "request_2": {
+		        "doc_id": [ 1 ], 
+		        "rank": [ 1.0 ],
+		        "result": "true"
+	        },
 		"request_3": {
-		    "result": "false"
+			"result": "false"
 		}
 	}
   }
