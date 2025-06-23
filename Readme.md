@@ -60,10 +60,10 @@
   {
 	"answers": {
 		"request_1": {
-			"result": "true",
 			"relevance": {
-				 "doc_id": [ 0, 1, 2, 3 ], 
-                                 "rank": [ 0.989, 0.897, 0.750, 0.670 ]
+			    "doc_id": [ 0, 1, 2, 3 ], 
+                            "rank": [ 0.989, 0.897, 0.750, 0.670 ],
+			    "result": "true"
 			}
 		},
 
