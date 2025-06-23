@@ -11,7 +11,7 @@ int main()
 
     try
     {
-        cvr.checkConfigJSON();
+        cvr.checkResoursesJSON();
     }
     catch ( const invalid_argument& e )
     {
@@ -20,8 +20,8 @@ int main()
     }
 
     cvr.setDocuments();
+    cvr.setRequestsJSON();
     cvr.setResponsesLimit();
-    cvr.checkRequestsJSON();
 
     InvertedIndex idx( cvr );
     idx.updateDocumentBase( cvr.getDocuments() );

@@ -20,11 +20,11 @@ public:
 
     void setConfigJSON();
 
-    void checkConfigJSON();
-
     void setRequestsJSON();
 
-    void checkRequestsJSON();
+    void setAnswersJSON();
+
+    void checkResoursesJSON();
 
     void setResponsesLimit();
 

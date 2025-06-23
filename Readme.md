@@ -62,17 +62,16 @@
 		"request_1": {
 			"result": "true",
 			"relevance": {
-				 "doc_id": 0, “rank”: 0.989,
-				 "doc_id": 1, “rank”: 0.897,
-				 "doc_id": 2, “rank”: 0.750,
-				 "doc_id": 3, “rank”: 0.670,
-				 "doc_id": 4, “rank”: 0.561
+				 "doc_id": [ 0, 1, 2, 3 ], 
+                                 "rank": [ 0.989, 0.897, 0.750, 0.670 ]
 			}
 		},
-		"request_2": {
-			 "result": "true",
-			 "doc_id": 0, “rank” : 0.769
-		},
+
+        "request_2": {
+            "doc_id": [ 1 ], 
+            "rank": [ 1.0 ],
+            "result": "true"
+        },
 		"request_3": {
 			"result": "false"
 		}
