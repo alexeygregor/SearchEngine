@@ -3,8 +3,9 @@
 
 void ConverterJSON::checkResoursesJSON()
 {
+    string err_message = "Resourses file is missing: ";
     if ( ifstream Check1_1( "resourses/config.json", ios::in ); ! Check1_1 )
-        throw invalid_argument( "Resourses file is missing: config.json" );
+        throw invalid_argument( err_message + "config.json" );
     else
     {
         json dict1;
@@ -23,10 +24,10 @@ void ConverterJSON::checkResoursesJSON()
     }
 
     if ( ifstream Check2( "resourses/requests.json", ios::in ); ! Check2 )
-        throw invalid_argument( "Resourses file is missing: requests.json" );
+        throw invalid_argument( err_message + "requests.json" );
 
     if ( ifstream Check3( "resourses/answers.json", ios::in ); ! Check3 )
-        throw invalid_argument( "Resourses file is missing: answers.json" );
+        throw invalid_argument( err_message + "answers.json" );
 }
 
 void ConverterJSON::setConfigJSON()
@@ -163,13 +164,13 @@ void ConverterJSON::putAnswers( const vector<vector<pair<int, float>>>& answers 
                         temp[ "doc_id" ].push_back( answers[ i ][ j ].first );
                         temp[ "rank" ].push_back( answers[ i ][ j ].second );
                     }
-                    else
-                    {
-                        json array = json::array( {
+                    else {
+                        map<string, double> answer;
+                        answer.insert( {
                             { "doc_id", answers[ i ][ j ].first },
                             { "rank", answers[ i ][ j ].second }
                         } );
-                        temp[ "relevance" ].push_back( array );
+                        temp[ "relevance" ].push_back( answer );
                     }
                 }
             }
