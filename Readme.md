@@ -56,10 +56,10 @@
     "answers": {
         "request_1": {
             "relevance": [
-                [
-                    [ "doc_id", 0 ], 
-                    [ "rank", 0.989 ]
-                ],
+               [
+                  [ "doc_id", 0 ], 
+                  [ "rank", 0.989 ]
+               ],
                [
                   [ "doc_id", 1 ],
                   [ "rank", 0.897 ]
