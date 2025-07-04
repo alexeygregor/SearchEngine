@@ -53,40 +53,40 @@
 Пример описания файла answers.json:
 ```javascript
 {
-	"answers": {
-		"request_1": {
-			"relevance": [
-				{
-				"doc_id": 8.0,
-				"rank": 1.0
-				},
-				{
-				  "doc_id": 2.0,
-				  "rank": 0.2857142984867096
-				},
-				{
-				  "doc_id": 1.0,
-				  "rank": 0.1428571492433548
-				},
-				{
-				  "doc_id": 3.0,
-				  "rank": 0.1428571492433548
-				},
-				{
-				  "doc_id": 9.0,
-				  "rank": 0.1428571492433548
-				}
-			],
-			"result": "true"
-		},
-	        "request_2": {
-			"doc_id": [ 1 ],
-			"rank": [ 1.0 ],
-                	"result": "true"
-        	},
-        	"request_3": {
-			"result": "false"
-        	}
-    	}
+    "answers": {
+        "request_1": {
+            "relevance": [
+                {
+                    "doc_id": 8.0,
+                    "rank": 1.0
+                },
+                {
+                    "doc_id": 2.0,
+                    "rank": 0.2857142984867096
+                },
+                {
+                    "doc_id": 1.0,
+                    "rank": 0.1428571492433548
+                },
+                {
+                    "doc_id": 3.0,
+                    "rank": 0.1428571492433548
+                },
+                {
+                    "doc_id": 9.0,
+                    "rank": 0.1428571492433548
+                }
+            ],
+            "result": "true"
+        },
+	"request_2": {
+	    "doc_id": [ 1 ],
+	    "rank": [ 1.0 ],
+	    "result": "true"
+	},
+	"request_3": {
+	    "result": "false"
+	}
+    }
 }
 ```
