@@ -66,9 +66,8 @@ void InvertedIndex::updateDocumentBase( vector<string> input_docs )
                 {
                     letterCase( word[ i ] );
 
-                    if ( word[ i ] == '.' || word[ i ] == ',' || word[ i ] == '!' || word[ i ] == '?'
-                      || word[ i ] == '-' || word[ i ] == ':' || word[ i ] == ';' || word[ i ] == '(' || word[ i ] == ')' 
-					  || word[ i ] == '"' || word[ i ] == '\'' || ( word[ i ] == '\'' && word[ i + 1 ] == 's' ) )
+                    if ( validSimbols( word[ i ] ) ||
+                        ( word[ i ] == '\'' && word[ i + 1 ] == 's' ) )
                     {
                         if ( word[ i ] == '\'' && word[ i + 1 ] == 's' ) ++i;
                         if ( ! buffer.empty() ) texts_input.push_back( buffer );
@@ -81,7 +80,7 @@ void InvertedIndex::updateDocumentBase( vector<string> input_docs )
                 if ( texts_input.size() > 1000 || buffer.length() > 10 )
                 {
                     cerr << "file_" << to_string( doc_id );
-                    if ( buffer.length() > 10 ) cerr << ": " << buffer << " \n";
+                    if ( buffer.length() > 10 ) cerr << " wideword: " << buffer << " \n";
                     else cerr << ": lots of words" << " \n";
                     texts_input.clear();
                     break;
@@ -105,8 +104,8 @@ void InvertedIndex::updateDocumentBase( vector<string> input_docs )
                 ++simbol;
             }
         }
-
         suffixS( texts_input );
+
         indexDocument( doc_id, texts_input );
     };
 
@@ -125,7 +124,17 @@ void InvertedIndex::updateDocumentBase( vector<string> input_docs )
     while ( thread_count < input_docs.size() );
 }
 
-char InvertedIndex::letterCase( char& value )
+bool InvertedIndex::validSimbols( char& value )
+{
+    string simbols = ".,!?-:;()'\"\\|/{}[]<>_+=@#$%^&*~`";
+
+    for( auto & i : simbols )
+        if ( value == i )
+            return true;
+    return false;
+}
+
+void InvertedIndex::letterCase( char& value )
 {
     string caps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -133,14 +142,13 @@ char InvertedIndex::letterCase( char& value )
     {
         if ( value == i )
         {
-            tolower( value );
+            value = tolower( value );
             break;
         }
     }
-    return value;
-};
+}
 
-void InvertedIndex::suffixS ( vector<string>& texts_input)
+void InvertedIndex::suffixS ( vector<string>& texts_input )
 {
     for( auto & i : texts_input )
     {
@@ -170,10 +178,8 @@ vector<Entry> InvertedIndex::getWordCount( const string& word )
     for ( it = freq_dictionary.begin(); it != freq_dictionary.end(); ++it )
     {
         if ( word == it->first )
-        {
             for ( auto & i : it->second )
                 entry.push_back( { i.doc_id, i.count } );
-        }
     }
     return entry;
 }

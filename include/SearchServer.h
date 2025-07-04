@@ -24,9 +24,9 @@ public:
 
     vector<vector<RelativeIndex>> search( vector<string> queries_input );
 
-    void searchDocument( vector<string>& input_words );
+    void requestsParsing( vector<string>& input_words );
 
-    void searchDocuments( vector<vector<size_t>>& document );
+    void distribution( vector<vector<size_t>>& document );
 
     const vector<vector<pair<int, float>>>& getAnswers( ConverterJSON& cvr );
 

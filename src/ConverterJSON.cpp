@@ -1,38 +1,49 @@
 
 #include "ConverterJSON.h"
 
-void ConverterJSON::setConfigJSON()
-{
-    ifstream getFile( "resourses/config.json" );
-    getFile >> dict;
-    ofstream putFile( "config.json" );
-    putFile << dict;
-	cout << "Create config.json" << endl;
-}
-
 void ConverterJSON::checkResoursesJSON()
 {
-    if ( ifstream Check1( "config.json", ios::in ); ! Check1 )
+    if ( ifstream Check1_1( "resourses/config.json", ios::in ); ! Check1_1 )
         throw invalid_argument( "Resourses file is missing: config.json" );
     else
     {
         json dict1;
-        Check1 >> dict1;
+        Check1_1 >> dict1;
         if ( dict1[ "config" ].empty() )
-            throw invalid_argument( "Config file is empty" );
+            throw invalid_argument( "Resourses file is empty: config.json" );
 
         json dict2;
-        ifstream Check2( "resourses/config.json" );
-        Check2 >> dict2;
+        ifstream Check1_2( "config.json" );
+        Check1_2 >> dict2;
+        if ( dict2[ "config" ].empty() )
+            throw invalid_argument( "Config file is empty" );
+
         if ( dict1[ "config" ][ "version" ] != dict2[ "config" ][ "version" ] )
             throw invalid_argument( "config.json has incorrect file version" );
     }
 
-    if ( ifstream Check3( "resourses/requests.json", ios::in ); ! Check3 )
+    if ( ifstream Check2( "resourses/requests.json", ios::in ); ! Check2 )
         throw invalid_argument( "Resourses file is missing: requests.json" );
 
-    if ( ifstream Check4( "resourses/answers.json", ios::in ); ! Check4 )
+    if ( ifstream Check3( "resourses/answers.json", ios::in ); ! Check3 )
         throw invalid_argument( "Resourses file is missing: answers.json" );
+}
+
+void ConverterJSON::setConfigJSON()
+{
+    if ( ifstream Check( "config.json", ios::in ); ! Check )
+    {
+        string valid;
+        ifstream getFile( "resourses/config.json" );
+        getFile >> valid;
+        if ( ! valid.empty() )
+        {
+            getFile >> dict;
+            ofstream putFile( "config.json" );
+            putFile << dict;
+            cout << "Create config.json" << endl;
+        }
+    }
 }
 
 void ConverterJSON::setRequestsJSON()
@@ -97,10 +108,8 @@ void ConverterJSON::setRequest()
 
     requests.clear();
     if ( dict[ "requests" ].size() <= 1000 )
-    {
         for ( auto& i : dict[ "requests" ] )
             requests.push_back( i );
-    }
     else
         cerr << "1000+ requests" << endl;
 }
@@ -133,35 +142,38 @@ void ConverterJSON::putAnswers( const vector<vector<pair<int, float>>>& answers 
 {
     if ( ! requests.empty() )
     {
-        json dict;
+        dict.clear();
         setAnswersJSON();
         ofstream putFile( "answers.json" );
 
-        cout << answers.size() << endl;
         for ( auto i = 0; i < answers.size(); ++i )
         {
+            json temp;
             string request_count = to_string( i + 1 );
             if ( answers[ i ].empty() )
-                dict[ "answers" ][ "request_" + request_count ][ "result" ] = "false";
-
+                temp[ "result" ] = "false";
             else
             {
-                dict[ "answers" ][ "request_" + request_count ][ "result" ] = "true";
+                temp[ "result" ] = "true";
                 for ( auto j = 0; j < answers[ i ].size(); ++j )
                 {
                     if ( j == getResponsesLimit() ) break;
                     if ( answers[ i ].size() == 1 )
                     {
-                        dict[ "answers" ][ "request_" + request_count ][ "doc_id" ].push_back( answers[ i ][ j ].first );
-                        dict[ "answers" ][ "request_" + request_count ][ "rank" ].push_back( answers[ i ][ j ].second );
+                        temp[ "doc_id" ].push_back( answers[ i ][ j ].first );
+                        temp[ "rank" ].push_back( answers[ i ][ j ].second );
                     }
                     else
                     {
-                        dict[ "answers" ][ "request_" + request_count ][ "relevance" ][ "doc_id" ].push_back( answers[ i ][ j ].first );
-                        dict[ "answers" ][ "request_" + request_count ][ "relevance" ][ "rank" ].push_back( answers[ i ][ j ].second );
+                        json array = json::array( {
+                            { "doc_id", answers[ i ][ j ].first },
+                            { "rank", answers[ i ][ j ].second }
+                        } );
+                        temp[ "relevance" ].push_back( array );
                     }
                 }
             }
+            dict[ "answers" ][ "request_" + request_count ] = temp;
         }
         putFile << dict.dump(4);
         cout << "Search complete" << endl;

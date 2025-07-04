@@ -23,7 +23,9 @@ public:
 
     void updateDocumentBase( vector<string> input_docs );
 
-    char letterCase( char& value );
+    bool validSimbols ( char& value );
+
+    void letterCase( char& value );
 
     void suffixS ( vector<string>& texts_input);
 

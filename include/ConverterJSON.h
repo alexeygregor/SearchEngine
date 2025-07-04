@@ -18,13 +18,13 @@ public:
 
     ConverterJSON() = default;
 
+    void checkResoursesJSON();
+
     void setConfigJSON();
 
     void setRequestsJSON();
 
     void setAnswersJSON();
-
-    void checkResoursesJSON();
 
     void setResponsesLimit();
 
@@ -39,6 +39,8 @@ public:
     int getResponsesLimit();
 
     bool getDBUpdate();
+
+    json dictionary (string request_count);
 
     void putAnswers( const vector<vector<pair<int, float>>>& answers );
 

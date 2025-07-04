@@ -34,12 +34,12 @@ vector<vector<RelativeIndex>> SearchServer::search( vector<string> queries_input
             cerr << "Overlong request" << endl;
         }
         else
-            searchDocument( input_words );
+            requestsParsing( input_words );
     }
     return relative_index;
 }
 
-void SearchServer::searchDocument( vector<string>& input_words )
+void SearchServer::requestsParsing( vector<string>& input_words )
 {
     vector<Entry> entry;
     vector<vector<size_t>> infrequent, document;
@@ -81,10 +81,10 @@ void SearchServer::searchDocument( vector<string>& input_words )
             if ( check ) document.push_back( { j.count, j.doc_id } );
         }
     }
-    searchDocuments( document );
+    distribution( document );
 }
 
-void SearchServer::searchDocuments( vector<vector<size_t>>& document )
+void SearchServer::distribution( vector<vector<size_t>>& document )
 {
     int max = 0;
     float rank = 0;
