@@ -126,7 +126,7 @@ void InvertedIndex::updateDocumentBase( vector<string> input_docs )
 
 bool InvertedIndex::validSimbols( char& value )
 {
-    string simbols = ".,!?-:;()'\"\\|/{}[]<>_+=@#$%^&*~`";
+    string simbols = ".,!?-:;()'\"\\|/{}[]<>_+=№@#$%^&*~`";
 
     for( auto & i : simbols )
         if ( value == i )
