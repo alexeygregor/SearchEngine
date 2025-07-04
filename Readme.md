@@ -56,28 +56,33 @@
     "answers": {
         "request_1": {
             "relevance": [
-                [
-                    [ "doc_id", 0 ], 
-                    [ "rank", 0.989 ]
-                ],
-               [
-                  [ "doc_id", 1 ],
-                  [ "rank", 0.897 ]
-               ],
-               [
-                  [ "doc_id", 2 ],
-                  [ "rank", 0.750 ]
-               ],
-               [
-                  [ "doc_id", 3 ],
-                  [ "rank", 0.670 ]
-               ]
-            ]
-        },
+               {
+                  "doc_id": 8.0,
+                  "rank": 1.0
+               },
+               {
+                  "doc_id": 2.0,
+                  "rank": 0.2857142984867096
+               },
+               {
+                  "doc_id": 1.0,
+                  "rank": 0.1428571492433548
+               },
+               {
+                  "doc_id": 3.0,
+                  "rank": 0.1428571492433548
+               },
+               {
+                  "doc_id": 9.0,
+                  "rank": 0.1428571492433548
+               }
+           ],
+           "result": "true"
+      },
         "request_2": {
             "doc_id": [ 1 ],
-                "rank": [ 1.0 ],
-                "result": "true"
+			"rank": [ 1.0 ],
+			"result": "true"
         },
         "request_3": {
             "result": "false"
