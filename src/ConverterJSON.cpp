@@ -165,8 +165,7 @@ void ConverterJSON::putAnswers( const vector<vector<pair<int, float>>>& answers 
                         temp[ "rank" ].push_back( answers[ i ][ j ].second );
                     }
                     else {
-                        map<string, double> answer;
-                        answer.insert( {
+                        map<string, double> answer( {
                             { "doc_id", answers[ i ][ j ].first },
                             { "rank", answers[ i ][ j ].second }
                         } );
