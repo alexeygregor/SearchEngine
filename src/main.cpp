@@ -11,7 +11,7 @@ int main()
 
     try
     {
-        cvr.checkResoursesJSON();
+        cvr.checkConfigJSON();
     }
     catch ( const invalid_argument& e )
     {

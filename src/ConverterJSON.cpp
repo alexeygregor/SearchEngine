@@ -1,49 +1,44 @@
 
 #include "ConverterJSON.h"
 
-void ConverterJSON::checkResoursesJSON()
+void ConverterJSON::checkConfigJSON()
 {
-    string err_message = "Resourses file is missing: ";
-    if ( ifstream Check1_1( "resourses/config.json", ios::in ); ! Check1_1 )
-        throw invalid_argument( err_message + "config.json" );
-    else
+    json dict1, dict2;
+
+    string valid;
+    ifstream Check1( "config.json", ios::in );
+    Check1 >> valid;
+    if ( ! valid.empty() )
     {
-        json dict1;
+        ifstream Check1_1( "config.json", ios::in );
         Check1_1 >> dict1;
+
         if ( dict1[ "config" ].empty() )
-            throw invalid_argument( "Resourses file is empty: config.json" );
-
-        json dict2;
-        ifstream Check1_2( "config.json" );
-        Check1_2 >> dict2;
-        if ( dict2[ "config" ].empty() )
             throw invalid_argument( "Config file is empty" );
-
-        if ( dict1[ "config" ][ "version" ] != dict2[ "config" ][ "version" ] )
-            throw invalid_argument( "config.json has incorrect file version" );
     }
 
-    if ( ifstream Check2( "resourses/requests.json", ios::in ); ! Check2 )
-        throw invalid_argument( err_message + "requests.json" );
+    ifstream Check2( "resourses/config.json", ios::in );
+    Check2 >> dict2;
 
-    if ( ifstream Check3( "resourses/answers.json", ios::in ); ! Check3 )
-        throw invalid_argument( err_message + "answers.json" );
+    if ( dict2[ "config" ].empty() )
+        throw invalid_argument( "Сonfig file is missing" );
+
+    if ( dict1[ "config" ][ "version" ] != dict2[ "config" ][ "version" ] )
+        throw invalid_argument( "config.json has incorrect file version" );
 }
 
 void ConverterJSON::setConfigJSON()
 {
-    if ( ifstream Check( "config.json", ios::in ); ! Check )
+    string valid;
+    ifstream Check( "config.json", ios::in );
+    Check >> valid;
+    if ( valid.empty() )
     {
-        string valid;
         ifstream getFile( "resourses/config.json" );
-        getFile >> valid;
-        if ( ! valid.empty() )
-        {
-            getFile >> dict;
-            ofstream putFile( "config.json" );
-            putFile << dict;
-            cout << "Create config.json" << endl;
-        }
+        getFile >> dict;
+        ofstream putFile( "config.json" );
+        putFile << dict;
+        cout << "Create config.json" << endl;
     }
 }
 
@@ -139,7 +134,7 @@ bool ConverterJSON::getDBUpdate()
     return true;
 }
 
-void ConverterJSON::putAnswers( const vector<vector<pair<int, float>>>& answers )
+    void ConverterJSON::putAnswers( const vector<vector<pair<int, float>>>& answers )
 {
     if ( ! requests.empty() )
     {
