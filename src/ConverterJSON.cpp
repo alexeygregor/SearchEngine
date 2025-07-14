@@ -1,42 +1,47 @@
 
 #include "ConverterJSON.h"
 
+bool ConverterJSON::valid( const string& value )
+{
+    string valid;
+    ifstream Check( value, ios::in );
+    Check >> valid;
+    return ! valid.empty();
+}
+
+json ConverterJSON::configJSON()
+{
+    json dict;
+    ifstream getFile( "config.json", ios::in );
+    getFile >> dict;
+    return dict;
+}
+
 void ConverterJSON::checkConfigJSON()
 {
-    json dict1, dict2;
-
-    string valid;
-    ifstream Check1( "config.json", ios::in );
-    Check1 >> valid;
-    if ( ! valid.empty() )
+    if ( valid( "config.json" ) )
     {
-        ifstream Check1_1( "config.json", ios::in );
-        Check1_1 >> dict1;
+        dict.clear();
+        ifstream Check( "resourses/config.json", ios::in );
+        Check >> dict;
 
-        if ( dict1[ "config" ].empty() )
+        if ( configJSON()[ "config" ].empty() )
             throw invalid_argument( "Config file is empty" );
+        if ( dict[ "config" ].empty() )
+            throw invalid_argument( "Сonfig file is missing" );
+        if ( dict[ "config" ][ "version" ] != configJSON()[ "config" ][ "version" ] )
+            throw invalid_argument( "config.json has incorrect file version" );
     }
-
-    ifstream Check2( "resourses/config.json", ios::in );
-    Check2 >> dict2;
-
-    if ( dict2[ "config" ].empty() )
-        throw invalid_argument( "Сonfig file is missing" );
-
-    if ( dict1[ "config" ][ "version" ] != dict2[ "config" ][ "version" ] )
-        throw invalid_argument( "config.json has incorrect file version" );
 }
 
 void ConverterJSON::setConfigJSON()
 {
-    string valid;
-    ifstream Check( "config.json", ios::in );
-    Check >> valid;
-    if ( valid.empty() )
+    if ( ! valid( "config.json" ) )
     {
-        ifstream getFile( "resourses/config.json" );
+        dict.clear();
+        ifstream getFile( "resourses/config.json", ios::in );
         getFile >> dict;
-        ofstream putFile( "config.json" );
+        ofstream putFile( "config.json");
         putFile << dict;
         cout << "Create config.json" << endl;
     }
@@ -44,12 +49,10 @@ void ConverterJSON::setConfigJSON()
 
 void ConverterJSON::setRequestsJSON()
 {
-    string valid;
-    ifstream Check( "requests.json" );
-    Check >> valid;
-    if ( valid.empty() )
+    if ( ! valid( "requests.json" ) )
     {
-        ifstream getFile( "resourses/requests.json" );
+        dict.clear();
+        ifstream getFile( "resourses/requests.json", ios::in );
         getFile >> dict;
         ofstream putFile( "requests.json" );
         putFile << dict;
@@ -59,12 +62,10 @@ void ConverterJSON::setRequestsJSON()
 
 void ConverterJSON::setAnswersJSON()
 {
-    string valid;
-    ifstream Check( "answers.json" );
-    Check >> valid;
-    if ( valid.empty() )
+    if ( ! valid( "answers.json" ) )
     {
-        ifstream getFile( "resourses/answers.json" );
+        dict.clear();
+        ifstream getFile( "resourses/answers.json", ios::in );
         getFile >> dict;
         ofstream putFile( "answers.json" );
         putFile << dict;
@@ -74,103 +75,100 @@ void ConverterJSON::setAnswersJSON()
 
 void ConverterJSON::setResponsesLimit()
 {
-    ifstream File( "config.json" );
-    File >> dict;
-    max_responses = dict[ "config" ][ "max_responses" ];
+    max_responses = configJSON()[ "config" ][ "max_responses" ];
 }
 
 void ConverterJSON::setDocuments()
 {
-    ifstream File( "config.json" );
-    File >> dict;
-    documents.clear();
-    for ( auto& i : dict[ "files" ] )
+    dict = configJSON()[ "files" ];
+    for ( auto& i : dict )
         documents.push_back( i );
 }
 
-vector<string> ConverterJSON::getDocuments()
+vector<string>& ConverterJSON::getDocuments()
 {
     return documents;
 }
 
 void ConverterJSON::setRequest()
 {
+    dict.clear();
     setRequestsJSON();
-    ifstream getFile( "requests.json" );
+    ifstream getFile( "requests.json", ios::in );
     getFile >> dict;
 
-    if ( dict[ "requests" ].empty() )
-        cerr << "Nothing a search for" << endl;
-
-    requests.clear();
-    if ( dict[ "requests" ].size() <= 1000 )
+    if ( dict[ "requests" ].size() > 1000 )
+        cerr << "1000+ requests" << endl;
+    else
         for ( auto& i : dict[ "requests" ] )
             requests.push_back( i );
-    else
-        cerr << "1000+ requests" << endl;
 }
 
-vector<string> ConverterJSON::getRequests()
+vector<string>& ConverterJSON::getRequests()
 {
     return requests;
 }
 
-int ConverterJSON::getResponsesLimit()
+int ConverterJSON::getResponsesLimit() const
 {
     return max_responses;
 }
 
-bool ConverterJSON::getDBUpdate()
+bool ConverterJSON::getDBUpdate() const
 {
-    ifstream Config( "config.json" );
-    Config >> dict;
-    int db_update = dict[ "config" ][ "db_update" ];
-
-    if ( requests.size() == 0 ||
-         requests.size() % db_update != 0 )
+    if ( int db_update = configJSON()["config"]["db_update"];
+        requests.empty() || requests.size() % db_update != 0 )
         return false;
-
     cout << "DocumentBase update" << endl;
     return true;
 }
 
-    void ConverterJSON::putAnswers( const vector<vector<pair<int, float>>>& answers )
+void ConverterJSON::putAnswers( vector<vector<pair<int, float>>>& answers )
 {
     if ( ! requests.empty() )
     {
-        dict.clear();
         setAnswersJSON();
-        ofstream putFile( "answers.json" );
-
-        for ( auto i = 0; i < answers.size(); ++i )
-        {
-            json temp;
-            string request_count = to_string( i + 1 );
-            if ( answers[ i ].empty() )
-                temp[ "result" ] = "false";
-            else
-            {
-                temp[ "result" ] = "true";
-                for ( auto j = 0; j < answers[ i ].size(); ++j )
-                {
-                    if ( j == getResponsesLimit() ) break;
-                    if ( answers[ i ].size() == 1 )
-                    {
-                        temp[ "doc_id" ].push_back( answers[ i ][ j ].first );
-                        temp[ "rank" ].push_back( answers[ i ][ j ].second );
-                    }
-                    else {
-                        map<string, double> answer( {
-                            { "doc_id", answers[ i ][ j ].first },
-                            { "rank", answers[ i ][ j ].second }
-                        } );
-                        temp[ "relevance" ].push_back( answer );
-                    }
-                }
-            }
-            dict[ "answers" ][ "request_" + request_count ] = temp;
-        }
-        putFile << dict.dump(4);
         cout << "Search complete" << endl;
     }
+    else
+    {
+        answers.clear();
+        cout << "Nothing a search for" << endl;
+    }
+
+    dict.clear();
+    ofstream putFile( "answers.json" );
+
+    for ( auto i = 0; i < answers.size(); ++i )
+    {
+        json temp;
+        if ( answers[ i ].empty() )
+            temp[ "result" ] = "false";
+        else
+        {
+            temp[ "result" ] = "true";
+            for ( auto j = 0; j < answers[ i ].size(); ++j )
+            {
+                if ( j == getResponsesLimit() ) break;
+
+                int doc_id = answers[ i ][ j ].first;
+                float rank = answers[ i ][ j ].second;
+
+                if ( answers[ i ].size() == 1 )
+                {
+                    temp[ "doc_id" ].push_back( doc_id );
+                    temp[ "rank" ].push_back( rank );
+                }
+                else
+                {
+                    map<string, float> answer( {
+                        { "doc_id", doc_id },
+                        { "rank", rank } } );
+                    temp[ "relevance" ].push_back( answer );
+                }
+            }
+        }
+        dict[ "answers" ][ "request_" + to_string( i + 1 ) ] = temp;
+    }
+    putFile << dict.dump(4);
 }

@@ -3,9 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
-#include <mutex>
 #include <string>
-#include <thread>
 #include <vector>
 
 #include "nlohmann/json.hpp"
@@ -17,6 +15,10 @@ class ConverterJSON
 public:
 
     ConverterJSON() = default;
+
+    static bool valid( const string& value );
+
+    static json configJSON();
 
     void checkConfigJSON();
 
@@ -30,19 +32,17 @@ public:
 
     void setDocuments();
 
-    vector<string> getDocuments();
+    vector<string>& getDocuments();
 
     void setRequest();
 
-    vector<string> getRequests();
+    vector<string>& getRequests();
 
-    int getResponsesLimit();
+    int getResponsesLimit() const;
 
-    bool getDBUpdate();
+    bool getDBUpdate() const;
 
-    json dictionary (string request_count);
-
-    void putAnswers( const vector<vector<pair<int, float>>>& answers );
+    void putAnswers( vector<vector<pair<int, float>>>& answers );
 
 private:
     json dict;

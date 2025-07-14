@@ -1,7 +1,12 @@
 #pragma once
 
+#include <fstream>
+#include <string>
+#include <vector>
+
 #include "ConverterJSON.h"
 #include "InvertedIndex.h"
+using namespace std;
 
 struct RelativeIndex
 {
@@ -20,15 +25,15 @@ public:
 
     SearchServer() = default;
 
-    SearchServer( InvertedIndex& idx );
+    SearchServer( const InvertedIndex& idx );
 
-    vector<vector<RelativeIndex>> search( vector<string> queries_input );
+    vector<vector<RelativeIndex>>& search( vector<string>& queries_input );
 
-    void requestsParsing( vector<string>& input_words );
+    void requestParsing( const vector<string>& input_words );
 
     void distribution( vector<vector<size_t>>& document );
 
-    const vector<vector<pair<int, float>>>& getAnswers( ConverterJSON& cvr );
+    vector<vector<pair<int, float>>>& getAnswers( ConverterJSON& cvr );
 
 private:
     InvertedIndex _index;

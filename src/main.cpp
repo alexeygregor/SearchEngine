@@ -1,7 +1,10 @@
 
+#include <iostream>
+
 #include "ConverterJSON.h"
 #include "InvertedIndex.h"
 #include "SearchServer.h"
+using namespace std;
 
 int main()
 {
@@ -35,6 +38,4 @@ int main()
         cvr.setDocuments();
         idx.updateDocumentBase( cvr.getDocuments() );
     }
-
-    //cin.get();
 }

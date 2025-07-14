@@ -2,9 +2,11 @@
 #include "ConverterJSON.h"
 #include "InvertedIndex.h"
 
+#include <utility>
+
 mutex dict_access;
 
-InvertedIndex::InvertedIndex( ConverterJSON& cvr ) : _convert( cvr ) {};
+InvertedIndex::InvertedIndex( const ConverterJSON&  cvr ) : _convert( cvr ) {};
 
 void InvertedIndex::indexDocument( const size_t& doc_id, vector<string>& texts_input )
 {
@@ -42,7 +44,7 @@ void InvertedIndex::indexDocument( const size_t& doc_id, vector<string>& texts_i
     ++thread_count;
 }
 
-void InvertedIndex::updateDocumentBase( vector<string> input_docs )
+void InvertedIndex::updateDocumentBase( vector<string>& input_docs )
 {
     freq_dictionary.clear();
 
@@ -62,50 +64,54 @@ void InvertedIndex::updateDocumentBase( vector<string> input_docs )
             while ( Document >> word )
             {
                 string buffer;
+                auto upload = [ &texts_input ]( string& buffer )
+                {
+                    if ( ! buffer.empty() ) texts_input.push_back( buffer );
+                    buffer.clear();
+                };
+
                 for ( auto i = 0; i < word.size(); ++i )
                 {
                     letterCase( word[ i ] );
 
-                    if ( validSimbols( word[ i ] ) ||
-                        ( word[ i ] == '\'' && word[ i + 1 ] == 's' ) )
+                    if ( word[ i ] == '\'' && word[ i + 1 ] == 's' )
                     {
-                        if ( word[ i ] == '\'' && word[ i + 1 ] == 's' ) ++i;
-                        if ( ! buffer.empty() ) texts_input.push_back( buffer );
-                        buffer.clear();
+                        ++i;
+                        upload( buffer );
                     }
-                    else  buffer += word[ i ];
+                    else if ( validSimbol( word[ i ] ) )
+                        upload( buffer );
+                    else
+                        buffer += word[ i ];
                 }
-                if ( ! buffer.empty() ) texts_input.push_back( buffer );
-
                 if ( texts_input.size() > 1000 || buffer.length() > 10 )
                 {
                     cerr << "file_" << to_string( doc_id );
-                    if ( buffer.length() > 10 ) cerr << " wideword: " << buffer << " \n";
-                    else cerr << ": lots of words" << " \n";
+                    buffer.length() > 10
+                    ? cerr << " wideword: " << buffer << " \n"
+                    : cerr << ": lots of words" << " \n";
                     texts_input.clear();
                     break;
                 }
+                upload( buffer );
             }
         }
         else
         {
-            int simbol = 0;
-            while( simbol < doc_page.length() )
+            for( auto i = 0; i < doc_page.length(); ++i )
             {
-                if ( doc_page[ simbol ] != ' ' ) word += doc_page[ simbol ];
-                if( ! word.empty() )
+                if ( doc_page[ i ] != ' ' )
                 {
-                    if( doc_page[ simbol ] == ' ' || simbol == doc_page.length() - 1 )
-                    {
-                        texts_input.push_back( word );
-                        word.clear();
-                    }
+                    word += doc_page[ i ];
+                    if ( i != doc_page.length() - 1 )
+                        continue;
                 }
-                ++simbol;
+                texts_input.push_back( word );
+                word.clear();
             }
         }
-        suffixS( texts_input );
 
+        suffixS( texts_input );
         indexDocument( doc_id, texts_input );
     };
 
@@ -124,48 +130,45 @@ void InvertedIndex::updateDocumentBase( vector<string> input_docs )
     while ( thread_count < input_docs.size() );
 }
 
-bool InvertedIndex::validSimbols( char& value )
-{
-    string simbols = ".,!?-:;()'\"\\|/{}[]<>_+=№@#$%^&*~`";
-
-    for( auto & i : simbols )
-        if ( value == i )
-            return true;
-    return false;
-}
-
 void InvertedIndex::letterCase( char& value )
 {
-    string caps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const string caps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    for( auto & i : caps )
-    {
+    for( auto& i : caps )
         if ( value == i )
         {
             value = tolower( value );
             break;
         }
-    }
+}
+
+bool InvertedIndex::validSimbol(const char& value )
+{
+    const string simbols = ".,!?-:;()'\"\\|/{}[]<>_+=№@#$%^&*~`";
+
+    for( auto& i : simbols )
+        return value == i;
+    return false;
 }
 
 void InvertedIndex::suffixS ( vector<string>& texts_input )
 {
-    for( auto & i : texts_input )
+    for( auto& i : texts_input )
     {
         if ( i.size() <= 3 ) continue;
 
         if ( i[ i.size() - 1 ] == 's')
         {
-            int spos = 0, pos3 = i.size() - 3;
-            string ies( "ies" ), suffixes ( "oussisius" );
+            const int spos = 0;
+            const int pos3 = i.size() - 3;
+            const string suffixes ( "oussisius" );
 
-            if ( ! i.compare( pos3, 3, ies ) )
+            if ( ! i.compare( pos3, 3, "ies" ) )
                 i.replace( pos3, 3, 1, 'y' );
             else if ( ! i.compare( pos3, 3, suffixes, spos, 3 ) ||
                   ! i.compare( pos3, 3, suffixes, spos + 2, 2 ) ||
                   ! i.compare( pos3, 3, suffixes, spos + 4, 2 ) ||
-                  ! i.compare( pos3, 3, suffixes, spos + 6, 3 ) )
-                continue;
+                  ! i.compare( pos3, 3, suffixes, spos + 6, 3 ) ) {}
             else
                 i.erase( pos3 + 2 );
         }
@@ -178,8 +181,8 @@ vector<Entry> InvertedIndex::getWordCount( const string& word )
     for ( it = freq_dictionary.begin(); it != freq_dictionary.end(); ++it )
     {
         if ( word == it->first )
-            for ( auto & i : it->second )
-                entry.push_back( { i.doc_id, i.count } );
+            for ( auto& [ doc_id, count ] : it->second )
+                entry.push_back( {  doc_id, count } );
     }
     return entry;
 }

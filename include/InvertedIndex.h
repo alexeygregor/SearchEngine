@@ -1,6 +1,15 @@
 #pragma once
 
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <mutex>
+#include <string>
+#include <thread>
+#include <vector>
+
 #include "ConverterJSON.h"
+using namespace std;
 
 struct Entry
 {
@@ -17,23 +26,23 @@ class InvertedIndex
 public:
     InvertedIndex() = default;
 
-    InvertedIndex(ConverterJSON& cvr);
+    InvertedIndex( const ConverterJSON& cvr );
 
     void indexDocument( const size_t& doc_id, vector<string>& texts_input );
 
-    void updateDocumentBase( vector<string> input_docs );
+    void updateDocumentBase( vector<string>& input_docs );
 
-    bool validSimbols ( char& value );
+    static void letterCase( char& value );
 
-    void letterCase( char& value );
+    static bool validSimbol (const char& value );
 
-    void suffixS ( vector<string>& texts_input);
+    static void suffixS ( vector<string>& texts_input );
 
     vector<Entry> getWordCount( const string& word );
 
 private:
     ConverterJSON _convert;
-    int thread_count = 0;
     map<string, vector<Entry>>::iterator it;
     map<string, vector<Entry>> freq_dictionary;
+    int thread_count = 0;
 };
