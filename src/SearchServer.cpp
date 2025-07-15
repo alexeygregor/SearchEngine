@@ -2,7 +2,6 @@
 #include "ConverterJSON.h"
 #include "InvertedIndex.h"
 #include "SearchServer.h"
-#include <algorithm>
 
 SearchServer::SearchServer( const InvertedIndex& idx ) : _index( idx ) {};
 
