@@ -18,7 +18,7 @@
 
 
 #### Стек используемых технологий : ####
-    IDE Clion, MinGW, NlohmannJSON, GoogleTests.
+    IDE Clion, NlohmannJSON, GoogleTests.
 
 
 #### config.json : ####
