@@ -3,9 +3,9 @@
 #include "InvertedIndex.h"
 #include "SearchServer.h"
 
-SearchServer::SearchServer( const InvertedIndex& idx ) : _index( idx ) {};
+SearchServer::SearchServer( InvertedIndex& idx ) : _index( idx ) {};
 
-vector<vector<RelativeIndex>>& SearchServer::search( vector<string>& queries_input )
+vector<vector<RelativeIndex>>& SearchServer::search( vector<string> queries_input )
 {
     relative_index.clear();
 
@@ -14,12 +14,12 @@ vector<vector<RelativeIndex>>& SearchServer::search( vector<string>& queries_inp
         string word;
         vector<string> input_words;
 
-        for( auto i = 0; i < request.length(); ++i )
+        for( auto simbol = 0; simbol < request.length(); ++simbol )
         {
-            if ( request[ i ] != ' ' )
+            if ( request[ simbol ] != ' ' )
             {
-                word += request[ i ];
-                if ( i != request.length() - 1 )
+                word += request[ simbol ];
+                if ( simbol != request.length() - 1 )
                     continue;
             }
             input_words.push_back( word );
@@ -42,31 +42,22 @@ void SearchServer::requestParsing(const vector<string>& input_words )
     vector<Entry> entry;
     vector<vector<size_t>> infrequent, document;
 
-    for ( size_t i = 0; i < input_words.size(); ++i )
+    for ( auto& word : input_words )
     {
-        size_t count = 0;
-        entry = _index.getWordCount( input_words[ i ] );
-
-        for ( auto& [ doc_id, count ] : entry )
-            count += count;
-        infrequent.push_back( { count, i } );
-    }
-    sort( infrequent.begin(), infrequent.end() );
-
-    for ( auto& i : infrequent )
-    {
-        entry = _index.getWordCount( input_words[ i[ 1 ] ] );
+        entry = _index.getWordCount( word );
         for ( auto& [ doc_id, count ] : entry )
         {
             bool check = true;
-            for ( auto& j : document )
-                if ( j[ 1 ] ==  doc_id )
+            for ( auto& index : document )
+            {
+                if ( index[ 1 ] ==  doc_id )
                 {
-                    j[ 0 ] += count;
+                    index[ 0 ] += count;
                     check = false;
                     break;
                 }
-            if ( check ) document.push_back( { count,  doc_id } );
+            }
+            if ( check ) document.push_back( { count, doc_id } );
         }
     }
     distribution( document );
@@ -74,30 +65,30 @@ void SearchServer::requestParsing(const vector<string>& input_words )
 
 void SearchServer::distribution( vector<vector<size_t>>& document )
 {
+    float max = 0;
     if ( ! document.empty() )
     {
-        bool check = true;
-        while ( check )
+        for ( int count = 1; count < document.size(); ++count )
         {
-            check = false;
-            for ( auto i = 0; i < document.size() - 1; ++i )
-                if ( document[ i ][ 0 ] < document[ i + 1 ][ 0 ] )
-                {
-                    swap( document[ i ], document[ i + 1 ] );
-                    check = true;
-                }
+            int temp = count;
+            while ( temp > 0 && document[ temp - 1 ][ 0 ] < document[ temp ][ 0 ] )
+            {
+                swap( document[ temp - 1 ], document[ temp ] );
+                --temp;
+            }
         }
+        max = static_cast<float>( document[ 0 ][ 0 ] );
     }
-
+	
+    RelativeIndex rlv{};
     vector<RelativeIndex> input_relative;
+
+    int responsesLimit = ConverterJSON::getResponsesLimit();
     for ( auto& i : document )
     {
-        if ( ConverterJSON cvr; input_relative.size() == cvr.getResponsesLimit() )
-            break;
-        RelativeIndex rlv;
+        if ( input_relative.size() == responsesLimit ) break;
         rlv.doc_id = i[ 1 ];
-        rlv.rank = static_cast<float>( i[ 0 ] )
-                 / static_cast<float>( document [ 0 ][ 0 ] );
+        rlv.rank = static_cast<float>( i[ 0 ] ) / max;
         input_relative.push_back( { rlv.doc_id, rlv.rank } );
     }
     relative_index.push_back( input_relative );
@@ -105,10 +96,10 @@ void SearchServer::distribution( vector<vector<size_t>>& document )
 
 vector<vector<pair<int, float>>>& SearchServer::getAnswers( ConverterJSON& cvr )
 {
-    for ( auto& i : search( cvr.getRequests() ) )
+    for ( auto& relative_index : search( cvr.getRequests() ) )
     {
         vector<pair<int, float>> answer;
-        for ( auto&[ doc_id, rank ] : i )
+        for ( auto&[ doc_id, rank ] : relative_index )
             answer.emplace_back(  doc_id, rank );
         answers.push_back( answer );
     }

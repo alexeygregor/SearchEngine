@@ -8,134 +8,131 @@ mutex dict_access;
 
 InvertedIndex::InvertedIndex( const ConverterJSON&  cvr ) : _convert( cvr ) {};
 
-void InvertedIndex::indexDocument( const size_t& doc_id, vector<string>& texts_input )
+void InvertedIndex::indexDocument( const pair<vector<string>, const size_t>& texts_input )
 {
-    while ( ! texts_input.empty() )
+    unordered_map<string, size_t> words;
+    unordered_map<string, size_t>::iterator itw;
+
+    for ( auto& index : texts_input.first )
+        words.insert( pair( index, 0 ) );
+
+    for( itw = words.begin(); itw != words.end(); ++itw )
+        itw->second = ranges::count( texts_input.first, itw->first );
+
+    dict_access.lock();
+    for ( itw = words.begin(); itw != words.end(); ++itw )
     {
-        size_t count = 0;
-        vector<Entry> entry;
-
-        string word = texts_input[ 0 ];
-        for ( auto i = 0; i < texts_input.size(); ++i )
-        {
-            if ( word == texts_input[ i ] )
-            {
-                texts_input.erase( texts_input.begin() + i );
-                ++count;
-                --i;
-            }
-        }
-        entry.push_back( { doc_id, count } );
-
-        dict_access.lock();
         bool check = true;
         for ( it = freq_dictionary.begin(); it != freq_dictionary.end(); ++it )
         {
-            if ( it->first == word )
+            if ( it->first == itw->first )
             {
-                it->second.push_back( { doc_id, count } );
+                it->second.push_back( { texts_input.second, itw->second } );
                 check = false;
             }
         }
         if ( check || freq_dictionary.empty() )
-            freq_dictionary.insert( pair( word, entry ) );
-        dict_access.unlock();
+        {
+            vector<Entry>entry{ { texts_input.second, itw->second } };
+            freq_dictionary.insert( pair( itw->first, entry ) );
+        }
     }
-    ++thread_count;
+    dict_access.unlock();
 }
 
-void InvertedIndex::updateDocumentBase( vector<string>& input_docs )
+void InvertedIndex::updateDocumentBase( vector<string> input_docs )
 {
-    freq_dictionary.clear();
-
     auto thread_Dict = [ this ]( const string& doc_page, const size_t& doc_id )
     {
-        string word;
-        vector<string> texts_input;
-
-        if( ! _convert.getDocuments().empty() )
-        {
-            ifstream Check( doc_page.c_str(), ios::in );
-            Check >> word;
-            if( word.empty() )
-                cerr << "file_" << to_string( doc_id ) << " not found" << endl;
-
-            ifstream Document( doc_page.c_str(), ios::in );
-            while ( Document >> word )
-            {
-                string buffer;
-                auto upload = [ &texts_input ]( string& buffer )
-                {
-                    if ( ! buffer.empty() ) texts_input.push_back( buffer );
-                    buffer.clear();
-                };
-
-                for ( auto i = 0; i < word.size(); ++i )
-                {
-                    letterCase( word[ i ] );
-
-                    if ( word[ i ] == '\'' && word[ i + 1 ] == 's' )
-                    {
-                        ++i;
-                        upload( buffer );
-                    }
-                    else if ( validSimbol( word[ i ] ) )
-                        upload( buffer );
-                    else
-                        buffer += word[ i ];
-                }
-                if ( texts_input.size() > 1000 || buffer.length() > 10 )
-                {
-                    cerr << "file_" << to_string( doc_id );
-                    buffer.length() > 10
-                    ? cerr << " wideword: " << buffer << " \n"
-                    : cerr << ": lots of words" << " \n";
-                    texts_input.clear();
-                    break;
-                }
-                upload( buffer );
-            }
-        }
+        if ( _convert.getDocuments().empty() )
+            indexDocument( docOutVector( doc_page, doc_id ) );
         else
-        {
-            for( auto i = 0; i < doc_page.length(); ++i )
-            {
-                if ( doc_page[ i ] != ' ' )
-                {
-                    word += doc_page[ i ];
-                    if ( i != doc_page.length() - 1 )
-                        continue;
-                }
-                texts_input.push_back( word );
-                word.clear();
-            }
-        }
-
-        suffixS( texts_input );
-        indexDocument( doc_id, texts_input );
+            indexDocument( docOutFile( doc_page, doc_id ) );
     };
 
-    bool check = true;
-    for ( auto doc_id = 0; doc_id < input_docs.size(); ++doc_id )
+    if ( !ConverterJSON::checkDocBase() || _convert.getDBUpdate()  || _convert.getDocuments().empty() )
     {
-        if ( doc_id < 1000 )
-        {
-            jthread ThreadDict( thread_Dict, input_docs[ doc_id ], doc_id );
-            ThreadDict.detach();
-        }
-        else check = false;
-    }
-    if ( ! check ) cerr << "1000+ files" << endl;
+        vector<thread> thread_vec;
+        if ( input_docs.size() >= 1000 ) cerr << "1000+ files" << endl;
+        for ( auto doc_id = 0; doc_id < input_docs.size() && doc_id < 1000; ++doc_id )
+            thread_vec.emplace_back (thread_Dict, input_docs[ doc_id ], doc_id );
+        for ( auto & thread : thread_vec ) thread.join();
 
-    while ( thread_count < input_docs.size() );
+        if ( ! _convert.getDocuments().empty() ) setDocBase();
+    }
+    else getDocBase();
+}
+
+pair<vector<string>, const size_t> InvertedIndex::docOutVector( const string& doc_page, const size_t& doc_id )
+{
+    string word;
+    vector<string> texts_input;
+
+    for ( auto simbol = 0; simbol < doc_page.length(); ++simbol )
+    {
+        if ( doc_page[ simbol ] != ' ' )
+        {
+            word += doc_page[ simbol ];
+            if ( simbol != doc_page.length() - 1 )
+                continue;
+        }
+        texts_input.push_back( word );
+        word.clear();
+    }
+    return pair( texts_input, doc_id );
+}
+
+pair<vector<string>, const size_t> InvertedIndex::docOutFile(const string& doc_page, const size_t& doc_id)
+{
+    string word;
+    vector<string> texts_input;
+
+    if ( ifstream Check( doc_page.c_str(), ios::in ); !Check )
+        cerr << "file_" << to_string( doc_id ) << " not found" << endl;
+
+    ifstream Document( doc_page.c_str(), ios::in );
+    while ( Document >> word )
+    {
+        string buffer;
+        auto upload = [ &texts_input ]( string& buffer )
+        {
+            if ( ! buffer.empty() ) texts_input.push_back( buffer );
+            buffer.clear();
+        };
+
+        for ( auto simbol = 0; simbol < word.size(); ++simbol )
+        {
+            letterCase( word[ simbol ] );
+
+            if ( word[ simbol ] == '\'' && word[ simbol + 1 ] == 's' )
+            {
+                ++simbol;
+                upload( buffer );
+            }
+            else if ( validSimbol( word[ simbol ] ) )
+                upload( buffer );
+            else
+                buffer += word[ simbol ];
+        }
+        if ( texts_input.size() > 1000 || buffer.length() > 10 )
+        {
+            cerr << "file_" << to_string( doc_id );
+            buffer.length() > 10
+            ? cerr << " wideword: " << buffer << " \n"
+            : cerr << ": lots of words" << " \n";
+            texts_input.clear();
+            break;
+        }
+        upload( buffer );
+    }
+    return pair(texts_input, doc_id);
 }
 
 void InvertedIndex::letterCase( char& value )
 {
     const string caps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-    for( auto& i : caps )
-        if ( value == i )
+    for ( auto& simbol : caps )
+        if ( value == simbol )
         {
             value = tolower( value );
             break;
@@ -145,33 +142,34 @@ void InvertedIndex::letterCase( char& value )
 bool InvertedIndex::validSimbol(const char& value )
 {
     const string simbols = ".,!?-:;()'\"\\|/{}[]<>_+=№@#$%^&*~`";
-
-    for( auto& i : simbols )
-        return value == i;
+    for ( auto& simbol : simbols )
+        if ( value == simbol ) return true;
     return false;
 }
 
-void InvertedIndex::suffixS ( vector<string>& texts_input )
+void InvertedIndex::setDocBase()
 {
-    for( auto& i : texts_input )
+    map<string, vector<pair<size_t, size_t>>> doc_base;
+    for ( it = freq_dictionary.begin(); it != freq_dictionary.end(); ++it )
     {
-        if ( i.size() <= 3 ) continue;
+        vector<pair<size_t, size_t>> word_cnt;
+        for ( auto&[ doc_id, count ] : it->second )
+            word_cnt.emplace_back(  doc_id, count );
+        doc_base.insert(pair(it->first, word_cnt));
+    }
+    ConverterJSON::setDocBaseJSON( doc_base );
+}
 
-        if ( i[ i.size() - 1 ] == 's')
-        {
-            const int spos = 0;
-            const int pos3 = i.size() - 3;
-            const string suffixes ( "oussisius" );
-
-            if ( ! i.compare( pos3, 3, "ies" ) )
-                i.replace( pos3, 3, 1, 'y' );
-            else if ( ! i.compare( pos3, 3, suffixes, spos, 3 ) ||
-                  ! i.compare( pos3, 3, suffixes, spos + 2, 2 ) ||
-                  ! i.compare( pos3, 3, suffixes, spos + 4, 2 ) ||
-                  ! i.compare( pos3, 3, suffixes, spos + 6, 3 ) ) {}
-            else
-                i.erase( pos3 + 2 );
-        }
+void InvertedIndex::getDocBase()
+{
+    map doc_base( ConverterJSON::getDocBase() );
+    map<string, vector<pair<size_t, size_t>>>::iterator it;
+    for ( it = doc_base.begin(); it != doc_base.end(); ++it)
+    {
+        vector<Entry> entry;
+        for ( auto& [ doc_id, count ] : it->second )
+            entry.push_back( {  doc_id, count } );
+        freq_dictionary.insert(pair(it->first, entry));
     }
 }
 

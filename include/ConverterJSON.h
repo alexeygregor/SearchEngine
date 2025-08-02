@@ -16,19 +16,9 @@ public:
 
     ConverterJSON() = default;
 
-    static bool valid( const string& value );
-
     static json configJSON();
 
-    void checkConfigJSON();
-
-    void setConfigJSON();
-
-    void setRequestsJSON();
-
-    void setAnswersJSON();
-
-    void setResponsesLimit();
+    static void checkConfig();
 
     void setDocuments();
 
@@ -38,15 +28,19 @@ public:
 
     vector<string>& getRequests();
 
-    int getResponsesLimit() const;
+    static int getResponsesLimit() ;
 
     bool getDBUpdate() const;
 
-    void putAnswers( vector<vector<pair<int, float>>>& answers );
+    static bool checkDocBase();
+
+    static void setDocBaseJSON(map<string, vector<pair<size_t, size_t>>>& doc_base);
+
+    static map<string, vector<pair<size_t, size_t>>> getDocBase();
+
+    static void putAnswers(const vector<vector<pair<int, float>>>& answers ) ;
 
 private:
-    json dict;
-    int max_responses = 5;
     vector<string> requests;
     vector<string> documents;
 };

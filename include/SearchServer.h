@@ -25,9 +25,9 @@ public:
 
     SearchServer() = default;
 
-    SearchServer( const InvertedIndex& idx );
+    SearchServer( InvertedIndex& idx );
 
-    vector<vector<RelativeIndex>>& search( vector<string>& queries_input );
+    vector<vector<RelativeIndex>>& search( vector<string> queries_input );
 
     void requestParsing( const vector<string>& input_words );
 

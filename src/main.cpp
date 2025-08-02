@@ -8,34 +8,22 @@ using namespace std;
 
 int main()
 {
-    cout << endl;
     ConverterJSON cvr;
-    cvr.setConfigJSON();
-
     try
     {
-        cvr.checkConfigJSON();
+        cvr.checkConfig();
+        cvr.setRequest();
     }
-    catch ( const invalid_argument& e )
+    catch (exception& e)
     {
         cerr << e.what() << endl;
         return -1;
     }
-
+    cout << endl;
     cvr.setDocuments();
-    cvr.setRequestsJSON();
-    cvr.setResponsesLimit();
-
     InvertedIndex idx( cvr );
     idx.updateDocumentBase( cvr.getDocuments() );
-
-    cvr.setRequest();
     SearchServer srv( idx );
     cvr.putAnswers( srv.getAnswers( cvr ) );
-
-    if ( cvr.getDBUpdate() )
-    {
-        cvr.setDocuments();
-        idx.updateDocumentBase( cvr.getDocuments() );
-    }
+    return 0;
 }
