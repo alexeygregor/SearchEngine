@@ -72,7 +72,9 @@ pair<vector<string>, const size_t> InvertedIndex::docOutVector( const string& do
     {
         if ( doc_page[ simbol ] != ' ' )
         {
-            word += doc_page[ simbol ];
+            if ( ! validSimbol( doc_page[ simbol ] ) )
+                word += doc_page[ simbol ];
+
             if ( simbol != doc_page.length() - 1 )
                 continue;
         }
