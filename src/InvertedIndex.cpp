@@ -114,10 +114,10 @@ pair<vector<string>, const size_t> InvertedIndex::docOutFile(const string& doc_p
             else
                 buffer += word[ simbol ];
         }
-        if ( texts_input.size() > 1000 || buffer.length() > 10 )
+        if ( texts_input.size() > 1000 || buffer.length() > 100 )
         {
             cerr << "file_" << to_string( doc_id );
-            buffer.length() > 10
+            buffer.length() > 100
             ? cerr << " wideword: " << buffer << " \n"
             : cerr << ": lots of words" << " \n";
             texts_input.clear();
@@ -141,7 +141,7 @@ void InvertedIndex::letterCase( char& value )
 
 bool InvertedIndex::validSimbol(const char& value )
 {
-    const string simbols = ".,!?-:;()'\"\\|/{}[]<>_+=№@#$%^&*~`";
+    const string simbols = ".,!?-:;()'\"\\|/{}[]<>_+=№@#$%^&*~`1234567890";
     for ( auto& simbol : simbols )
         if ( value == simbol ) return true;
     return false;
