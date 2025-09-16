@@ -74,15 +74,15 @@
                 }
             ],
             "result": "true"
-        },
-	"request_2": {
-	    "doc_id": [ 1 ],
-	    "rank": [ 1.0 ],
-	    "result": "true"
-	},
-	"request_3": {
-	    "result": "false"
-	}
+		},
+		"request_2": {
+			"doc_id": [ 1 ],
+			"rank": [ 1.0 ],
+			"result": "true"
+		},
+		"request_3": {
+			"result": "false"
+		}
     }
 }
 ```
